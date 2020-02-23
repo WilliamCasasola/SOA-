@@ -84,7 +84,6 @@ int main(int argc, char** argv) {
 }
 
 void parseAndValidateParams(int argc, char** argv){
-    char *eptr;
     int withErrors = 0;
     
     expMeanE = expMeanW = 0.25;
