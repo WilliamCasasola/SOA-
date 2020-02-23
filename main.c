@@ -20,6 +20,8 @@ struct Bridge {
 
 struct Vehicle{
     int direction;
+    int startPosition;
+    char symbol;
 };
 
 double expMeanW;
@@ -155,6 +157,8 @@ void* spawnW() {
         pthread_t vehicleW;
         struct Vehicle* vehicle = malloc(sizeof(struct Vehicle));
         vehicle->direction = 1;
+        vehicle->symbol = '>';
+        vehicle->startPosition = 0;
         pthread_create(&vehicleW, NULL, crossBridge, (void*) vehicle);
         sleep(expDist(expMeanW));
     }
@@ -167,6 +171,8 @@ void* spawnE() {
         pthread_t vehicleE;
         struct Vehicle* vehicle = malloc(sizeof(struct Vehicle));
         vehicle->direction = -1;
+        vehicle->symbol = '<';
+        vehicle->startPosition = bridge.length - 1;
         pthread_create(&vehicleE, NULL, crossBridge, (void*) vehicle);
         sleep(expDist(expMeanE));
     }
@@ -185,7 +191,7 @@ void* crossBridge(void* vehicle){
         pthread_cond_wait(&directionChanged, &yieldDirection);
     }
     pthread_mutex_unlock(&yieldDirection);
-    int position = (currentVehicle->direction == 1) ? 0 : bridge.length - 1;
+    int position = currentVehicle->startPosition;
     int goingIn = 1;
     while (position > -1 && position < bridge.length){
         pthread_mutex_lock(&bridge.spot[position]);
@@ -200,7 +206,7 @@ void* crossBridge(void* vehicle){
             }
             goingIn = 0; 
         }
-        bridge.state[position] = (currentVehicle->direction == 1) ? '>' : '<';
+        bridge.state[position] = currentVehicle->symbol;
         printState();
         sleep(speed);
         bridge.state[position] = '_';
