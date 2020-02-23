@@ -77,6 +77,8 @@ int main(int argc, char** argv) {
     pthread_attr_destroy(&joinable);
 
     pthread_exit(NULL);
+    free(bridge.spot);
+    free(bridge.state);
 }
 
 void parseAndValidateParams(int argc, char** argv){
