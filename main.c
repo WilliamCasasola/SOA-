@@ -49,7 +49,7 @@ void parseAndValidateParams();
 
 int main(int argc, char** argv) {
     parseAndValidateParams(argc, argv);
-    
+
     bridge.occupied = 0;
     bridge.direction = 1;
     bridge.spot = malloc(bridge.length * sizeof (pthread_mutex_t));
@@ -59,14 +59,14 @@ int main(int argc, char** argv) {
         pthread_mutex_init(&bridge.spot[i], NULL);
         bridge.state[i] = '_';
     }
-    
+
     srand(time(NULL));
-    
+
     pthread_mutex_init(&bridgeOccupied, NULL);
     pthread_mutex_init(&yieldDirection, NULL);
     pthread_mutex_init(&sysOut, NULL);
     pthread_cond_init(&directionChanged, NULL);
-    
+
     pthread_t spawnerW;
     pthread_t spawnerE;
 
@@ -85,11 +85,11 @@ int main(int argc, char** argv) {
 
 void parseAndValidateParams(int argc, char** argv){
     int withErrors = 0;
-    
+
     expMeanE = expMeanW = 0.25;
     speed = 1;
     bridge.length = 5;
-    
+
     if(argc == 2 && strcmp(argv[1], "-h") == 0){
         printf("\n%s\n","Application receives up to 6 parameters, with the first two being mandatory, in the following order: \n\t Vehicles coming East : +int \n\t Vehicles coming West : +int \n\t East Spawn Mean : +double \n\t West Spawn Mean : +double \n\t Bridge Length : +int \n\t Vehicle Speed : +int\n");
         exit(EXIT_SUCCESS);
@@ -203,7 +203,7 @@ void* crossBridge(void* vehicle){
             }else{
                 waitingE--;
             }
-            goingIn = 0; 
+            goingIn = 0;
         }
         bridge.state[position] = currentVehicle->symbol;
         printState();
@@ -221,9 +221,9 @@ void* crossBridge(void* vehicle){
     if(!bridge.occupied && (waitingW || waitingE)){
         bridge.direction *= -1;
     }
-    pthread_mutex_unlock(&yieldDirection); 
+    pthread_mutex_unlock(&yieldDirection);
     free(currentVehicle);
-    pthread_exit(NULL);      
+    pthread_exit(NULL);
 }
 
 void printState() {
@@ -244,7 +244,9 @@ void printState() {
     printf("\n\t%s %i\n","Vehicles remaining east", vehiclesE);
     printf("\n\t%s %i\n","Vehicles waiting west", waitingW);
     printf("\n\t%s %i\n","Vehicles waiting east", waitingE);
+    pthread_mutex_lock(&yieldDirection);
     printf("\n\t%s %s\n","Bridge is going ", (bridge.direction == 1) ? "West to East" : "East to West");
+    pthread_mutex_unlock(&yieldDirection);
     printf("\n\t\t%s\n", bridge.state);
     pthread_mutex_unlock(&sysOut);
 }
