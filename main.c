@@ -186,6 +186,9 @@ void* crossBridge(void* vehicle){
     }else{
         waitingE++;
     }
+    if(!bridge.occupied && currentVehicle->direction != bridge.direction){
+        bridge.direction *= -1;
+    }
     while (currentVehicle->direction != bridge.direction){
         pthread_cond_wait(&directionChanged, &yieldDirection);
     }
