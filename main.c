@@ -33,6 +33,7 @@ int vehiclesEO;
 int waitingW;
 int waitingE;
 int speed;
+int isfirstCar;
 
 pthread_mutex_t bridgeOccupied;
 pthread_mutex_t yieldDirection;
@@ -49,6 +50,8 @@ void parseAndValidateParams();
 
 int main(int argc, char** argv) {
     parseAndValidateParams(argc, argv);
+    
+    isfirstCar = 1;
 
     bridge.occupied = 0;
     bridge.direction = 1;
@@ -180,15 +183,19 @@ void* spawnE() {
 
 void* crossBridge(void* vehicle){
     struct Vehicle* currentVehicle = (struct Vehicle*) vehicle;
+    pthread_mutex_lock(&bridgeOccupied);
+    if(isfirstCar && !bridge.occupied && currentVehicle->direction != bridge.direction){
+        bridge.direction *= -1;
+        isfirstCar = 0;
+    }
+    pthread_mutex_unlock(&bridgeOccupied);
     pthread_mutex_lock(&yieldDirection);
     if(currentVehicle->direction == 1){
         waitingW++;
     }else{
         waitingE++;
     }
-    if(!bridge.occupied && currentVehicle->direction != bridge.direction){
-        bridge.direction *= -1;
-    }
+    
     while (currentVehicle->direction != bridge.direction){
         pthread_cond_wait(&directionChanged, &yieldDirection);
     }
