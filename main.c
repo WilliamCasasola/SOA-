@@ -1,6 +1,6 @@
 /*
 * File: main.c
-* Author: Willard Zamora
+* Authors: Alpizar, Sequeira, Villalobos, Zamora
 */
 
 #include <stdio.h>
@@ -50,7 +50,7 @@ void parseAndValidateParams();
 
 int main(int argc, char** argv) {
     parseAndValidateParams(argc, argv);
-    
+
     isfirstCar = 1;
 
     bridge.occupied = 0;
@@ -195,7 +195,7 @@ void* crossBridge(void* vehicle){
     }else{
         waitingE++;
     }
-    
+
     while (currentVehicle->direction != bridge.direction){
         pthread_cond_wait(&directionChanged, &yieldDirection);
     }
